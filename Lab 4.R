@@ -9,16 +9,20 @@ library(terra)
 library(tmap)
 library(grid)
 
-setwd("C:/Users/pamel/Desktop/R/Lab 4")
 
-oh_counties<- read_sf ("./static_mapping/oh_counties.gpkg")
-oh_parks <- read_sf ("./static_mapping/oh_parks.gpkg")
-oh_streams<- read_sf ("./static_mapping/oh_rivers.gpkg")
-oh_rivers <- read_sf ("./static_mapping/tl_2023_39153_linearwater/tl_2023_39153_linearwater.shp")
-oh_rivers2<- read_sf ("./static_mapping/tl_2022_39133_linearwater/tl_2022_39133_linearwater.shp")
-oh_places <- read_sf("./static_mapping/oh_places.gpkg")
-oh_census<- read_csv("./static_mapping/oh_counties_DP2020.csv")
-oh_elev = rast("./static_mapping/neoh_dem.tif")
+sf::write_sf (oh_counties, "oh_counties.shp")
+sf::write_sf (oh_parks, "oh_parks.shp")
+sf::write_sf (oh_places, "oh_places.shp")
+
+
+oh_counties<- read_sf ("./oh_counties.shp")
+oh_parks <- read_sf ("./oh_parks.shp")
+oh_places <- read_sf ("./oh_places.shp")
+oh_rivers <- read_sf ("./tl_2023_39153_linearwater.shp")
+oh_rivers2<- read_sf ("./tl_2022_39133_linearwater.shp")
+oh_census<- read_csv ("./oh_counties_DP2020.csv")
+oh_elev = rast("./neoh_dem.tif")
+
 
 
 #OHIO SCALE 
@@ -48,16 +52,13 @@ placemap
 oh_places<- st_transform(oh_places, crs= st_crs(oh_counties))
 places_port_summ<-st_intersection(oh_places, port_summ)
 oh_parks<- st_transform(oh_parks, crs= st_crs(places_port_summ))
-oh_streams<- st_transform(oh_streams, crs= st_crs(oh_counties))
 oh_rivers<- st_transform(oh_rivers, crs= st_crs(oh_counties))
 oh_rivers2<- st_transform(oh_rivers2, crs = st_crs(oh_counties))
 river_port_summ<- st_intersection (oh_rivers, port_summ)
 river2_port_summ<- st_intersection(oh_rivers2,port_summ)
 finalriver<- st_union(river_port_summ,river2_port_summ)
 parks_port_summ<- st_intersection(oh_parks, port_summ)
-streams_port_summ<- st_intersection(oh_streams, port_summ)
 
-plot(oh_rivers)
 
 munc_bound<- tm_shape(places_port_summ) + tm_polygons(alpha = 0.5) + tm_borders(lwd = 1, col = "black") # tm_text("NAME", size = 0.5) (I would've added this code but I think some of the polygons overlap I tried making it valid but I still ran into the same error)
 munc_bound
@@ -66,8 +67,7 @@ munc_bound
 park_map<- tm_shape(parks_port_summ) + tm_polygons(fill = "FEATTYPE", palette= "matplotlib.greens")
 park_map
 
-stream_map<- tm_shape (finalriver) + tm_lines (lwd=1, col = "darkblue") +
-  tm_shape(streams_port_summ) + tm_lines (lwd = 3.5, col = "lightblue")
+stream_map<- tm_shape (finalriver) + tm_lines (lwd=1, col = "darkblue")
   
 stream_map
 
